@@ -54,7 +54,7 @@ Backend API for the Lawn Mowing Roster application.
 ## Environment Variables
 
 - `MONGODB_URI`: MongoDB connection string (required)
-- `ADMIN_PASSWORD`: Password for Max Adams admin account (required)
+- `ADMIN_PASSWORD`: Password for admin account (required)
 - `PORT`: Server port (optional, auto-set by hosting providers)
 
 ## API Endpoints
