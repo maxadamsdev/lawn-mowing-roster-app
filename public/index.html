@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lawn Mowing Roster - Headingly Center</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/emailjs-com/3.2.0/email.min.js"></script>
+</head>
+<body>
+    <div id="loginModal" class="modal active">
+        <div class="modal-content">
+            <h2>Welcome to Lawn Mowing Roster</h2>
+            <div class="loading" id="loadingUsers">
+                <div class="spinner"></div>
+                <p>Loading users...</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="hidden">
+                <div class="form-group">
+                    <label for="userSelect">Select Your Name:</label>
+                    <div class="user-dropdown">
+                        <input type="text" id="userSelect" placeholder="Type to search or select..." autocomplete="off" oninput="filterUsers()" onfocus="showUserDropdown()">
+                        <div id="userOptions" class="user-options"></div>
+                    </div>
+                </div>
+                <div id="passwordGroup" class="form-group hidden">
+                    <label for="passwordInput">Password:</label>
+                    <input type="password" id="passwordInput" placeholder="Enter admin password">
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="sessionModal" class="session-modal">
+        <div class="session-modal-content">
+            <h2>Session Details</h2>
+            <div id="sessionModalBody"></div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🌱 Lawn Mowing (Headingly Center)</h1>
+                <p>2 Headingly Lane, Richmond 7020, New Zealand</p>
+            </div>
+            <div>
+                <span class="user-badge" id="currentUserBadge"></span>
+                <button class="btn btn-logout" onclick="logout()" style="margin-left: 10px;">Logout</button>
+            </div>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <!-- Admin Only Sections -->
+        <div id="adminSections" class="hidden">
+            <div class="users-section">
+                <h2>👥 Manage Users</h2>
+                <div class="user-form">
+                    <input type="text" id="userName" placeholder="Name">
+                    <input type="email" id="userEmail" placeholder="Email">
+                    <input type="tel" id="userPhone" placeholder="Phone">
+                    <button class="btn btn-primary" onclick="addUser()">Add User</button>
+                </div>
+                <ul class="user-list" id="userList"></ul>
+            </div>
+            
+            <div class="my-roster-section">
+                <h2>📋 My Upcoming Sessions</h2>
+                <div id="adminRosterList"></div>
+            </div>
+            
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <h2 style="margin: 0; padding: 0; border: none;">📅 Session Calendar (Admin View)</h2>
+                    <div class="calendar-nav">
+                        <button onclick="previousMonth()">← Previous</button>
+                        <span class="current-month" id="currentMonth"></span>
+                        <button onclick="nextMonth()">Next →</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+            
+            <div class="unassigned-section">
+                <h2>⚠️ Unassigned Sessions</h2>
+                <div class="unassigned-list" id="unassignedList"></div>
+            </div>
+        </div>
+        
+        <!-- Regular User Sections -->
+        <div id="userSections" class="hidden">
+            <div class="my-roster-section">
+                <h2>📋 My Upcoming Sessions</h2>
+                <div id="myRosterList"></div>
+            </div>
+            
+            <div class="calendar-section">
+                <div class="calendar-header">
+                    <h2 style="margin: 0; padding: 0; border: none;">📅 Session Calendar</h2>
+                    <div class="calendar-nav">
+                        <button onclick="previousMonth()">← Previous</button>
+                        <span class="current-month" id="currentMonthUser"></span>
+                        <button onclick="nextMonth()">Next →</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGridUser"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Load JavaScript modules -->
+    <script src="/config.js"></script>
+    <script src="/api.js"></script>
+    <script src="/auth.js"></script>
+    <script src="/users.js"></script>
+    <script src="/calendar.js"></script>
+</body>
+</html>

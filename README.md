@@ -56,6 +56,12 @@ Backend API for the Lawn Mowing Roster application.
 - `MONGODB_URI`: MongoDB connection string (required)
 - `ADMIN_PASSWORD`: Password for admin account (required)
 - `PORT`: Server port (optional, auto-set by hosting providers)
+- `BASE_URL`: Base URL of your app (default: https://lawn-mowing-roster-app.onrender.com)
+- `EMAIL_USER`: Gmail address for sending emails (required for coverage requests)
+- `EMAIL_PASSWORD`: Gmail app password (required for coverage requests)
+- `TESTING_MODE`: Set to 'true' to send all emails to EMAIL_USER instead of actual recipients (optional)
+- `SSL_CERT_PATH`: Path to SSL certificate file (optional, for local HTTPS)
+- `SSL_KEY_PATH`: Path to SSL private key file (optional, for local HTTPS)
 
 ## API Endpoints
 
@@ -77,6 +83,16 @@ Backend API for the Lawn Mowing Roster application.
 ## Local Development
 
 1. Install dependencies: `npm install`
-2. Create `.env` file with your variables
-3. Run: `npm run dev`
-4. API will be at `http://localhost:3000/api`
+2. Create `.env` file with your variables:
+   ```bash
+   # Copy this example and update with your values
+   PORT=3000
+   MONGODB_URI=mongodb://localhost:27017/lawn-mowing-roster
+   ADMIN_PASSWORD=admin123
+   ```
+3. Run: `npm start`
+4. Open `http://localhost:3000` in your browser
+5. The frontend will automatically connect to `http://localhost:3000/api`
+6. For MongoDB, either:
+   - Install MongoDB locally, or
+   - Use MongoDB Atlas (cloud) - see instructions above
