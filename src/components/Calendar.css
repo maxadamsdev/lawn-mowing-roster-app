@@ -208,31 +208,30 @@
   z-index: 1;
 }
 
-.calendar-day.session {
-  /* Default background for single-tile sessions */
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+/* All session tiles now get gradients via inline styles - ensure CSS doesn't override */
+/* Single-tile sessions */
+.calendar-day.session:not(.range-start):not(.range-middle):not(.range-end),
+.calendar-day.unassigned:not(.range-start):not(.range-middle):not(.range-end),
+.calendar-day.confirmed:not(.range-start):not(.range-middle):not(.range-end) {
   color: white;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
 }
 
-.calendar-day.unassigned {
-  /* Default background for single-tile sessions */
-  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
-  color: white;
+/* Multi-tile sessions get gradient via inline style, ensure they have proper text styling */
+.calendar-day.session.range-start,
+.calendar-day.session.range-middle,
+.calendar-day.session.range-end,
+.calendar-day.unassigned.range-start,
+.calendar-day.unassigned.range-middle,
+.calendar-day.unassigned.range-end,
+.calendar-day.confirmed.range-start,
+.calendar-day.confirmed.range-middle,
+.calendar-day.confirmed.range-end {
+  color: white !important;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
-}
-
-.calendar-day.confirmed {
-  /* Default background for single-tile sessions */
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+  background: transparent;
 }
 
 
@@ -250,37 +249,29 @@
   z-index: 10; /* Selected days appear above all others */
 }
 
-/* Connected session period styling - merge adjacent days */
-/* Ensure border-radius changes apply regardless of session type (session, confirmed, unassigned) */
-/* Remove all borders and padding for seamless connection */
+/* Connected session period styling - merge adjacent days seamlessly */
 .calendar-day.session.range-start,
 .calendar-day.confirmed.range-start,
 .calendar-day.unassigned.range-start {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
-  margin-right: -14px !important;
+  margin-right: -12px !important; /* Overlap to close gap completely */
   position: relative;
   z-index: 1;
   border: none !important;
-  aspect-ratio: auto;
-  height: 100%;
   box-shadow: none !important;
-  outline: none !important;
 }
 
 .calendar-day.session.range-middle,
 .calendar-day.confirmed.range-middle,
 .calendar-day.unassigned.range-middle {
   border-radius: 0 !important;
-  margin-left: -10px;
-  margin-right: -14px !important; /* Aggressively close gap to right tile */
+  margin-left: -12px !important; /* Overlap with previous tile */
+  margin-right: -12px !important; /* Overlap with next tile */
   position: relative;
-  z-index: 2;
-  aspect-ratio: auto;
-  height: 100%;
+  z-index: 2; /* Middle tiles on top */
   border: none !important;
   box-shadow: none !important;
-  outline: none !important;
 }
 
 .calendar-day.session.range-end,
@@ -288,14 +279,11 @@
 .calendar-day.unassigned.range-end {
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
-  margin-left: -14px !important; /* Aggressively close gap from middle tile */
+  margin-left: -12px !important; /* Overlap to close gap completely */
   position: relative;
   z-index: 1;
   border: none !important;
-  aspect-ratio: auto;
-  height: 100%;
   box-shadow: none !important;
-  outline: none !important;
 }
 
 .day-number {

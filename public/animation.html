@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lawnmower Animation</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 70%, #7CCD7C 100%);
+            overflow: hidden;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Animation state
+        let time = 0;
+        const clouds = [];
+        const trees = [];
+        const grassBits = [];
+
+        // Initialize clouds
+        for (let i = 0; i < 5; i++) {
+            clouds.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * (canvas.height * 0.6),
+                scale: 0.5 + Math.random() * 0.5,
+                speed: 0.2 + Math.random() * 0.3
+            });
+        }
+
+        // Initialize trees
+        for (let i = 0; i < 8; i++) {
+            trees.push({
+                x: Math.random() * canvas.width,
+                scale: 0.4 + Math.random() * 0.6,
+                speed: 0.5
+            });
+        }
+
+        // Draw cloud using math
+        function drawCloud(x, y, scale) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.beginPath();
+            
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                const offsetX = Math.cos(angle) * 30 * scale;
+                const offsetY = Math.sin(angle) * 15 * scale;
+                const radius = (20 + Math.sin(i * 1.5) * 10) * scale;
+                
+                ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
+            }
+            
+            ctx.fill();
+        }
+
+        // Draw tree using math - more tree-like shape
+        function drawTree(x, y, scale) {
+            // Trunk with slight taper
+            ctx.fillStyle = '#654321';
+            const trunkWidth = 12 * scale;
+            const trunkHeight = 50 * scale;
+            
+            ctx.beginPath();
+            ctx.moveTo(x - trunkWidth/2, y);
+            ctx.lineTo(x - trunkWidth/3, y - trunkHeight);
+            ctx.lineTo(x + trunkWidth/3, y - trunkHeight);
+            ctx.lineTo(x + trunkWidth/2, y);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Foliage - triangular/conical shape with multiple layers
+            ctx.fillStyle = '#2d5016';
+            
+            // Bottom layer
+            ctx.beginPath();
+            ctx.moveTo(x, y - trunkHeight - 70 * scale);
+            ctx.lineTo(x - 45 * scale, y - trunkHeight + 10 * scale);
+            ctx.lineTo(x + 45 * scale, y - trunkHeight + 10 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Middle layer
+            ctx.fillStyle = '#3a6b1f';
+            ctx.beginPath();
+            ctx.moveTo(x, y - trunkHeight - 60 * scale);
+            ctx.lineTo(x - 35 * scale, y - trunkHeight - 10 * scale);
+            ctx.lineTo(x + 35 * scale, y - trunkHeight - 10 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Top layer
+            ctx.fillStyle = '#4a8029';
+            ctx.beginPath();
+            ctx.moveTo(x, y - trunkHeight - 50 * scale);
+            ctx.lineTo(x - 25 * scale, y - trunkHeight - 25 * scale);
+            ctx.lineTo(x + 25 * scale, y - trunkHeight - 25 * scale);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Draw rolling hills using sine waves (reversed parallax direction)
+        function drawHills(offset) {
+            const hillHeight = canvas.height * 0.3;
+            const baseY = canvas.height * 0.7;
+            
+            // Back hill (darker green)
+            ctx.fillStyle = '#5a9e3a';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            
+            for (let x = 0; x <= canvas.width; x += 5) {
+                const wave1 = Math.sin((x - offset * 0.5) * 0.005) * 40;
+                const wave2 = Math.sin((x - offset * 0.5) * 0.008 + 2) * 30;
+                const y = baseY - hillHeight * 0.3 + wave1 + wave2;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Front hill (lighter green)
+            ctx.fillStyle = '#7CCD7C';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            
+            for (let x = 0; x <= canvas.width; x += 5) {
+                const wave1 = Math.sin((x - offset) * 0.006) * 50;
+                const wave2 = Math.sin((x - offset) * 0.01 + 1) * 35;
+                const y = baseY + wave1 + wave2;
+                ctx.lineTo(x, y);
+            }
+            
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Get Y position on back hill for tree positioning
+        function getBackHillY(x, offset) {
+            const hillHeight = canvas.height * 0.3;
+            const baseY = canvas.height * 0.7;
+            const wave1 = Math.sin((x - offset * 0.5) * 0.005) * 40;
+            const wave2 = Math.sin((x - offset * 0.5) * 0.008 + 2) * 30;
+            return baseY - hillHeight * 0.3 + wave1 + wave2;
+        }
+
+        // Get Y position on front hill for positioning
+        function getHillY(x, offset) {
+            const baseY = canvas.height * 0.7;
+            const wave1 = Math.sin((x - offset) * 0.006) * 50;
+            const wave2 = Math.sin((x - offset) * 0.01 + 1) * 35;
+            return baseY + wave1 + wave2;
+        }
+
+        // Draw grass blades on the front hill - dense with surf wave shape
+        function drawGrassOnHill(offset) {
+            // Much denser grass with varied colors
+            for (let x = 0; x < canvas.width; x += 3) {
+                const hillY = getHillY(x, offset);
+                
+                // Vary grass height with surf wave curve
+                const wavePattern = Math.sin(x * 0.02 + offset * 0.03) * 5;
+                const grassHeight = 12 + wavePattern + Math.sin(x * 0.05) * 4;
+                
+                // Alternate between different green shades for depth
+                const colorVariation = Math.sin(x * 0.3 + offset * 0.1) * 30;
+                const greenValue = Math.floor(100 + colorVariation);
+                ctx.strokeStyle = `rgb(40, ${greenValue + 40}, 30)`;
+                ctx.lineWidth = 1.5;
+                
+                // Draw individual grass blade with surf-like curve
+                ctx.beginPath();
+                ctx.moveTo(x, hillY);
+                
+                // Create a gentle curve that leans like wind-blown grass
+                const lean = Math.sin(offset * 0.08 + x * 0.1) * 4;
+                const midX = x + lean * 0.5;
+                const tipX = x + lean;
+                
+                ctx.bezierCurveTo(
+                    midX, hillY - grassHeight * 0.4,
+                    midX, hillY - grassHeight * 0.7,
+                    tipX, hillY - grassHeight
+                );
+                ctx.stroke();
+            }
+        }
+
+        // Draw lawnmower (flipped horizontally)
+        function drawLawnmower(x, y, time) {
+            const scale = 1.5;
+            
+            // Body (flipped)
+            ctx.fillStyle = '#DC143C';
+            ctx.fillRect(x - 30 * scale, y - 30 * scale, 70 * scale, 30 * scale);
+            
+            // Handle (flipped)
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 4 * scale;
+            ctx.beginPath();
+            ctx.moveTo(x + 20 * scale, y - 30 * scale);
+            ctx.lineTo(x + 30 * scale, y - 70 * scale);
+            ctx.stroke();
+            
+            // Wheels
+            ctx.fillStyle = '#333';
+            const wheel1X = x - 15 * scale;
+            const wheel2X = x + 25 * scale;
+            const wheelY = y;
+            const wheelRadius = 12 * scale;
+            
+            // Wheel rotation
+            const rotation = time * 5;
+            
+            for (let wx of [wheel1X, wheel2X]) {
+                ctx.beginPath();
+                ctx.arc(wx, wheelY, wheelRadius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Spokes
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 4; i++) {
+                    const angle = rotation + (i * Math.PI / 2);
+                    ctx.beginPath();
+                    ctx.moveTo(wx, wheelY);
+                    ctx.lineTo(
+                        wx + Math.cos(angle) * wheelRadius * 0.7,
+                        wheelY + Math.sin(angle) * wheelRadius * 0.7
+                    );
+                    ctx.stroke();
+                }
+            }
+            
+            // Blade area (underneath, flipped)
+            ctx.fillStyle = '#555';
+            ctx.fillRect(x - 25 * scale, y - 5 * scale, 60 * scale, 5 * scale);
+            
+            // Rotating blade effect
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            const bladeX = x + 5 * scale;
+            const bladeY = y - 2 * scale;
+            const bladeLength = 25 * scale;
+            const bladeAngle = time * 10;
+            
+            ctx.moveTo(
+                bladeX - Math.cos(bladeAngle) * bladeLength,
+                bladeY - Math.sin(bladeAngle) * bladeLength
+            );
+            ctx.lineTo(
+                bladeX + Math.cos(bladeAngle) * bladeLength,
+                bladeY + Math.sin(bladeAngle) * bladeLength
+            );
+            ctx.stroke();
+        }
+
+        // Grass particle
+        function createGrassBit(x, y) {
+            grassBits.push({
+                x: x,
+                y: y,
+                vx: 3 + Math.random() * 3,
+                vy: -4 - Math.random() * 3,
+                rotation: Math.random() * Math.PI * 2,
+                rotSpeed: (Math.random() - 0.5) * 0.3,
+                life: 1.0,
+                size: 3 + Math.random() * 4
+            });
+        }
+
+        // Draw grass bit
+        function drawGrassBit(bit) {
+            ctx.save();
+            ctx.translate(bit.x, bit.y);
+            ctx.rotate(bit.rotation);
+            ctx.fillStyle = `rgba(34, 139, 34, ${bit.life})`;
+            ctx.fillRect(-bit.size/2, -bit.size/2, bit.size, bit.size);
+            ctx.restore();
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            time += 0.016;
+            const scrollOffset = time * 60;
+
+            // Draw and update clouds (slowest parallax) - reversed direction
+            clouds.forEach(cloud => {
+                cloud.x += cloud.speed;
+                if (cloud.x > canvas.width + 100) {
+                    cloud.x = -100;
+                    cloud.y = Math.random() * (canvas.height * 0.6);
+                }
+                drawCloud(cloud.x, cloud.y, cloud.scale);
+            });
+
+            // Draw hills with parallax
+            drawHills(scrollOffset);
+
+            // Draw grass on front hill
+            drawGrassOnHill(scrollOffset);
+
+            // Draw and update trees - positioned exactly on back hill, moving with it
+            trees.forEach(tree => {
+                tree.x += tree.speed;
+                if (tree.x > canvas.width + 100) {
+                    tree.x = -100;
+                }
+                const treeY = getBackHillY(tree.x, scrollOffset);
+                drawTree(tree.x, treeY, tree.scale);
+            });
+
+            // Lawnmower position (bottom right, on the front hill)
+            const mowerX = canvas.width - 150;
+            const hillY = getHillY(mowerX, scrollOffset);
+            const mowerY = hillY - 5;
+
+            // Generate grass bits periodically
+            if (Math.random() < 0.3) {
+                createGrassBit(mowerX + 20, mowerY - 10);
+            }
+
+            // Update and draw grass bits
+            for (let i = grassBits.length - 1; i >= 0; i--) {
+                const bit = grassBits[i];
+                bit.x += bit.vx;
+                bit.y += bit.vy;
+                bit.vy += 0.2; // gravity
+                bit.rotation += bit.rotSpeed;
+                bit.life -= 0.02;
+
+                if (bit.life <= 0 || bit.y > canvas.height) {
+                    grassBits.splice(i, 1);
+                } else {
+                    drawGrassBit(bit);
+                }
+            }
+
+            // Draw lawnmower
+            drawLawnmower(mowerX, mowerY, time);
+
+            requestAnimationFrame(animate);
+        }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
+</html>

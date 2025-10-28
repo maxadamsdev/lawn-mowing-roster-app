@@ -32,21 +32,10 @@ export const Calendar: React.FC = () => {
     });
   };
   
-  // Calculate gradient style for a session tile - creates one continuous gradient across all tiles
+  // Calculate gradient style for a session tile - simple vertical gradient for all tiles
   const getGradientStyle = (dateStr: string, session: any) => {
     if (!session) return {};
-    
-    const { dayBeforeStr, primaryDateStr, dayAfterStr } = getSessionDateRange(session.date);
-    const sessionDates = [dayBeforeStr, primaryDateStr, dayAfterStr];
-    const visibleSessionDates = sessionDates.filter(d => visibleDates.includes(d)).sort();
-    
-    if (visibleSessionDates.length <= 1) return {};
-    
-    const totalTiles = visibleSessionDates.length;
-    const tileIndex = visibleSessionDates.indexOf(dateStr);
-    
-    if (tileIndex === -1) return {};
-    
+
     // Get base colors based on session type
     let color1, color2;
     if (!session.userId) {
@@ -59,20 +48,10 @@ export const Calendar: React.FC = () => {
       color1 = '#f97316';
       color2 = '#ea580c';
     }
-    
-    // Create one gradient that spans all tiles
-    // Background size = totalTiles * 100% (e.g., 3 tiles = 300%)
-    // Background position shifts each tile to show its portion
-    // For tile 0: position = 0%, tile 1: position = -100%, tile 2: position = -200%
-    const backgroundSize = `${totalTiles * 100}% 100%`;
-    const backgroundPosition = `${-(tileIndex * 100)}% 0%`;
-    
-    // Return style object - inline styles have highest specificity in React
+
+    // Simple vertical gradient for all tiles in the session
     return {
-      background: `linear-gradient(to right, ${color1} 0%, ${color2} 100%)`,
-      backgroundSize: backgroundSize,
-      backgroundPosition: backgroundPosition,
-      backgroundRepeat: 'no-repeat'
+      background: `linear-gradient(to bottom, ${color1}, ${color2})`
     } as React.CSSProperties;
   };
 
@@ -155,30 +134,20 @@ export const Calendar: React.FC = () => {
       // Check if this is a session from adjacent month (should be disabled but visible)
       const isAdjacentMonthSession = session && !day.isCurrentMonth;
       
-      // Calculate gradient style for multi-tile sessions
-      // Check if this session spans multiple visible tiles
+      // Calculate gradient style for ALL session tiles
       let style: React.CSSProperties = {};
+
       if (session) {
-        const { dayBeforeStr, primaryDateStr, dayAfterStr } = getSessionDateRange(session.date);
-        const sessionDates = [dayBeforeStr, primaryDateStr, dayAfterStr];
-        const visibleSessionDates = sessionDates.filter(d => visibleDates.includes(d));
-        
-        // If session spans multiple visible tiles, apply gradient
-        if (visibleSessionDates.length > 1 && visibleSessionDates.includes(day.date)) {
-          const gradientStyle = getGradientStyle(day.date, session);
-          if (Object.keys(gradientStyle).length > 0) {
-            style = gradientStyle;
-          }
+        const gradientStyle = getGradientStyle(day.date, session);
+        if (gradientStyle && Object.keys(gradientStyle).length > 0) {
+          style = gradientStyle;
         }
       }
-
-      // Check if we're applying a gradient (multi-tile session)
-      const hasGradient = Object.keys(style).length > 0;
       
       return (
         <div
           key={day.date}
-          className={className + (isAdjacentMonthSession ? ' adjacent-month-session' : '') + (hasGradient ? ' has-gradient' : '')}
+          className={className + (isAdjacentMonthSession ? ' adjacent-month-session' : '')}
           style={style}
           onClick={() => {
             if (session && !isAdjacentMonthSession) {

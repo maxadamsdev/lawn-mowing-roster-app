@@ -5,6 +5,7 @@ import { Calendar } from './components/Calendar';
 import { MyRoster } from './components/MyRoster';
 import { AdminPanel } from './components/AdminPanel';
 import { AdminDashboard } from './components/AdminDashboard';
+import { LawnAnimation } from './components/LawnAnimation';
 import './App.css';
 import './components/Layout.css';
 import './components/ui/Button.css';
@@ -37,6 +38,7 @@ function App() {
 
   return (
     <div className="app">
+      <LawnAnimation darkMode={darkMode} />
       <header className="app-header">
         <div className="header-left">
           <h1>🌱 Lawn Mowing (Headingly Center)</h1>
