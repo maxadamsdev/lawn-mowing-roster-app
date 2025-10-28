@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { usersApi } from '../services/api';
 import { Button, Input, Modal } from './ui';
 import { User } from '../types';
+import './UserManagement.css';
 
 export const UserManagement: React.FC = () => {
   const { users, refreshUsers, showAlert } = useApp();

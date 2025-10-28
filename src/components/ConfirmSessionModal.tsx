@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { sessionsApi } from '../services/api';
+import { getSessionDateRange, formatDateToYYYYMMDD } from '../utils/dateUtils';
 
 interface Props {
   sessionId: string;
@@ -22,16 +23,12 @@ export const ConfirmSessionModal: React.FC<Props> = ({ sessionId, onClose }) => 
       const dt = new Date(arrivalDateTime);
       const session = await sessionsApi.getAll().then(r => r.sessions.find(s => s._id === sessionId));
       if (session) {
-        const sessionDate = new Date(session.date + 'T00:00:00');
-        const dayBefore = new Date(sessionDate);
-        dayBefore.setDate(dayBefore.getDate() - 1);
-        const dayAfter = new Date(sessionDate);
-        dayAfter.setDate(dayAfter.getDate() + 1);
-
-        const selectedDate = dt.toISOString().split('T')[0];
-        if (selectedDate === dayBefore.toISOString().split('T')[0]) arrivalDay = 'before';
-        else if (selectedDate === sessionDate.toISOString().split('T')[0]) arrivalDay = 'primary';
-        else if (selectedDate === dayAfter.toISOString().split('T')[0]) arrivalDay = 'after';
+        const { dayBeforeStr, primaryDateStr, dayAfterStr } = getSessionDateRange(session.date);
+        const selectedDate = formatDateToYYYYMMDD(dt);
+        
+        if (selectedDate === dayBeforeStr) arrivalDay = 'before';
+        else if (selectedDate === primaryDateStr) arrivalDay = 'primary';
+        else if (selectedDate === dayAfterStr) arrivalDay = 'after';
 
         arrivalTime = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
       }

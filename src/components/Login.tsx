@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { authApi } from '../services/api';
+import './Login.css';
 
 export const Login: React.FC = () => {
   const { users, setCurrentUser, showAlert } = useApp();
@@ -18,7 +19,9 @@ export const Login: React.FC = () => {
         u.email.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredUsers(filtered);
-      setShowDropdown(filtered.length > 0);
+      // Only show dropdown if searchTerm doesn't exactly match a user's name (i.e., user hasn't been selected yet)
+      const exactMatch = users.find(u => u.name.toLowerCase() === searchTerm.toLowerCase());
+      setShowDropdown(filtered.length > 0 && !exactMatch);
     } else {
       setFilteredUsers(users);
       setShowDropdown(false);

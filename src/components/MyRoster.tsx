@@ -1,24 +1,21 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { SessionModal } from './SessionModal';
-import { formatDateShort, formatDateRange, getSessionDateRange } from '../utils/dateUtils';
+import { formatDateShort, formatDateRange, getSessionDateRange, isPastDate } from '../utils/dateUtils';
 import { Card } from './ui';
+import './Roster.css';
 
 export const MyRoster: React.FC = () => {
   const { sessions, currentUser } = useApp();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const isPastDate = (dateString: string): boolean => {
-    const date = new Date(dateString + 'T00:00:00');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
-
   const mySessions = sessions
     .filter(s => s.userId === currentUser?._id)
     .filter(s => !isPastDate(s.date))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    .sort((a, b) => {
+      // Simple string comparison works since dates are in YYYY-MM-DD format
+      return a.date.localeCompare(b.date);
+    });
 
   return (
     <>
@@ -33,7 +30,7 @@ export const MyRoster: React.FC = () => {
             {mySessions.map(session => {
               const { dayBeforeStr, dayAfterStr } = getSessionDateRange(session.date);
               const primaryDate = formatDateShort(session.date);
-              const dateRange = `${formatDateShort(dayBeforeStr)} - ${formatDateShort(dayAfterStr)}`;
+              const dateRange = formatDateRange(dayBeforeStr, dayAfterStr);
 
               return (
                 <div

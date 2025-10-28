@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserManagement } from './UserManagement';
 import { Card } from './ui';
+import './Admin.css';
 
 export const AdminDashboard: React.FC = () => {
   return (

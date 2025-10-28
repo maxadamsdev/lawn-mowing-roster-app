@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '../types';
 import { usersApi, sessionsApi } from '../services/api';
+import '../components/Alert.css';
 
 interface AppContextType {
   currentUser: User | null;
@@ -8,7 +9,9 @@ interface AppContextType {
   sessions: Session[];
   isLoading: boolean;
   error: string | null;
+  darkMode: boolean;
   setCurrentUser: (user: User | null) => void;
+  setDarkMode: (darkMode: boolean) => void;
   refreshUsers: () => Promise<void>;
   refreshSessions: () => Promise<void>;
   showAlert: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -31,12 +34,46 @@ interface Alert {
 }
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  // Initialize currentUser from localStorage immediately to persist login state
+  const [currentUser, setCurrentUserState] = useState<User | null>(() => {
+    try {
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        return JSON.parse(storedUser);
+      }
+    } catch (e) {
+      localStorage.removeItem('currentUser');
+    }
+    return null;
+  });
+
   const [users, setUsers] = useState<User[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  
+  // Load dark mode preference from localStorage, default to false
+  const [darkMode, setDarkModeState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
+
+  // Wrapper for setCurrentUser that also persists to localStorage
+  const setCurrentUser = (user: User | null) => {
+    setCurrentUserState(user);
+    if (user) {
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('currentUser');
+    }
+  };
+
+  const setDarkMode = (value: boolean) => {
+    setDarkModeState(value);
+    localStorage.setItem('darkMode', value.toString());
+    document.documentElement.classList.toggle('dark', value);
+  };
 
   const showAlert = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     const id = Date.now();
@@ -69,31 +106,44 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   useEffect(() => {
     const initialize = async () => {
       setIsLoading(true);
-      await Promise.all([refreshUsers(), refreshSessions()]);
       
-      // Check for stored user
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        try {
-          setCurrentUser(JSON.parse(storedUser));
-        } catch (e) {
-          localStorage.removeItem('currentUser');
+      // Load users and sessions
+      const [usersResult] = await Promise.all([
+        usersApi.getAll().then(r => r.users),
+        refreshSessions()
+      ]);
+      
+      // Update users state
+      setUsers(usersResult);
+      
+      // Verify stored user still exists in the users list
+      // Read directly from localStorage to check the persisted user
+      try {
+        const storedUserJson = localStorage.getItem('currentUser');
+        if (storedUserJson) {
+          const storedUser: User = JSON.parse(storedUserJson);
+          const userStillExists = usersResult.some((u: User) => u._id === storedUser._id);
+          
+          if (!userStillExists) {
+            // User no longer exists, clear login state
+            setCurrentUser(null);
+          }
         }
+      } catch (e) {
+        // Invalid stored user, clear it
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
       }
       
       setIsLoading(false);
     };
 
     initialize();
+    
+    // Apply dark mode class on mount
+    document.documentElement.classList.toggle('dark', darkMode);
   }, []);
 
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('currentUser');
-    }
-  }, [currentUser]);
 
   return (
     <AppContext.Provider
@@ -103,7 +153,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         sessions,
         isLoading,
         error,
+        darkMode,
         setCurrentUser,
+        setDarkMode,
         refreshUsers,
         refreshSessions,
         showAlert,

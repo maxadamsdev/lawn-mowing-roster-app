@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from './context/AppContext';
 import { Login } from './components/Login';
 import { Calendar } from './components/Calendar';
@@ -6,11 +6,14 @@ import { MyRoster } from './components/MyRoster';
 import { AdminPanel } from './components/AdminPanel';
 import { AdminDashboard } from './components/AdminDashboard';
 import './App.css';
+import './components/Layout.css';
+import './components/ui/Button.css';
+import './components/Alert.css';
 
 type Page = 'home' | 'admin-dashboard';
 
 function App() {
-  const { currentUser, setCurrentUser, isLoading } = useApp();
+  const { currentUser, setCurrentUser, isLoading, darkMode, setDarkMode } = useApp();
   const [currentPage, setCurrentPage] = useState<Page>('home');
 
   const handleLogout = () => {
@@ -56,6 +59,13 @@ function App() {
               </button>
             </nav>
           )}
+          <button 
+            className="theme-toggle"
+            onClick={() => setDarkMode(!darkMode)}
+            title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
           <div className="user-badge">
             <strong>{currentUser.name}</strong>
             {currentUser.isAdmin && <span className="admin-badge">Admin</span>}

@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const BASE_URL = process.env.BASE_URL || 'https://lawn-mowing-roster-app.onrender.com';
 
 // Middleware

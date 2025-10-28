@@ -1,0 +1,72 @@
+/* Login */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-card {
+  background: var(--bg-card);
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-card h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+}
+
+.login-card p {
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+}
+
+.login-subtitle {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin-bottom: 30px;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--border-color-input);
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+

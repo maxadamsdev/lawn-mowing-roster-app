@@ -1,0 +1,56 @@
+/* Admin Panel */
+.admin-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.admin-panel h2 {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+/* Admin Dashboard */
+.admin-dashboard h1 {
+  color: var(--text-primary);
+  font-size: 32px;
+}
+
+/* Unassigned Sessions */
+.unassigned-section {
+  background: var(--bg-card);
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: var(--shadow-md);
+}
+
+.unassigned-section h2 {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.unassigned-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.unassigned-item {
+  background: #fff5f5;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #f56565;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+:root.dark .unassigned-item {
+  background: #4a1a1a;
+}
+
+.unassigned-item:hover {
+  transform: translateX(5px);
+}
+

@@ -1,6 +1,7 @@
 import React from 'react';
 import { UserManagement } from './UserManagement';
 import { MyRoster } from './MyRoster';
+import './Admin.css';
 
 export const AdminPanel: React.FC = () => {
   return (

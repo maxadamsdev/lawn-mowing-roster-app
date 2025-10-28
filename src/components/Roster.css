@@ -1,0 +1,59 @@
+/* My Roster */
+.roster-section h2 {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+.roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.roster-item {
+  background: var(--bg-secondary);
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.roster-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.roster-item.confirmed {
+  border-left: 4px solid #48bb78;
+}
+
+.roster-item.unconfirmed {
+  border-left: 4px solid #f56565;
+}
+
+.roster-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.roster-status {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Responsive Roster */
+@media (max-width: 768px) {
+  .roster-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+

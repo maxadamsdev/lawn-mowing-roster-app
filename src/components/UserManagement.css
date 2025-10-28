@@ -1,0 +1,93 @@
+/* User Management */
+.users-section h2 {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+.user-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.user-form input {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid var(--border-color-input);
+  border-radius: 8px;
+  font-size: 16px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.user-form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.user-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.user-item {
+  background: var(--bg-secondary);
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.user-email {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.user-phone {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Responsive User Management */
+@media (max-width: 768px) {
+  .user-form {
+    flex-direction: column;
+  }
+  
+  .user-form input {
+    width: 100%;
+  }
+  
+  .user-item {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .user-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
